@@ -43,78 +43,79 @@ public class PairServiceImpl implements PairService {
         wrapper.eq("is_sleuth", 0);
         wrapper.eq("path0", USDT).or().eq("path1", USDT);
         List<AllPair> allPairs = allPairRepository.list(wrapper);
-        List<AllPair> executePairs1 = allPairs.subList(0, 1000);
-        List<AllPair> executePairs2 = allPairs.subList(1000, 2000);
-        List<AllPair> executePairs3 = allPairs.subList(2000, 3000);
-        List<AllPair> executePairs4 = allPairs.subList(3000, 4000);
-        List<AllPair> executePairs5 = allPairs.subList(4000, 5000);
-        List<AllPair> executePairs6 = allPairs.subList(5000, 6000);
-        List<AllPair> executePairs7 = allPairs.subList(6000, 7000);
-        List<AllPair> executePairs8 = allPairs.subList(7000, 8000);
-        List<AllPair> executePairs9 = allPairs.subList(8000, 9000);
+        List<AllPair> allList = allPairRepository.list();
+        List<AllPair> executePairs1 = allPairs.subList(0, 3000);
+        List<AllPair> executePairs2 = allPairs.subList(3000, 6000);
+        List<AllPair> executePairs3 = allPairs.subList(6000, 9000);
+        List<AllPair> executePairs4 = allPairs.subList(9000, 12000);
+        List<AllPair> executePairs5 = allPairs.subList(12000, 15000);
+        List<AllPair> executePairs6 = allPairs.subList(15000, 18000);
+        List<AllPair> executePairs7 = allPairs.subList(18000, 21000);
+        List<AllPair> executePairs8 = allPairs.subList(21000, allPairs.size());
         ExecutorService executor = Executors.newCachedThreadPool();
         executor.submit(() -> {
             for (AllPair allPair : executePairs1) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs1);
+            log.info("executePairs1链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs2) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs2);
+            log.info("executePairs2链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs3) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs3);
+            log.info("executePairs3链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs4) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs4);
+            log.info("executePairs4链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs5) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs5);
+            log.info("executePairs5链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs6) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs6);
+            log.info("executePairs6链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs7) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs7);
+            log.info("executePairs7链路执行完毕！");
         });
         executor.submit(() -> {
             for (AllPair allPair : executePairs8) {
-                doSleuthById(allPair.getId());
+                doSleuth2ById(allPair.getId(), allList);
                 allPair.setIsSleuth(1);
             }
             allPairRepository.updateBatchById(executePairs8);
-        });
-        executor.submit(() -> {
-            for (AllPair allPair : executePairs9) {
-                doSleuthById(allPair.getId());
-                allPair.setIsSleuth(1);
-            }
-            allPairRepository.updateBatchById(executePairs9);
+            log.info("executePairs7链路执行完毕！");
         });
     }
 
@@ -144,27 +145,30 @@ public class PairServiceImpl implements PairService {
         pairSleuthRepository.saveBatch(pairSleuths);
     }
 
-    public void doSleuth2ById(Integer id) {
+    public void doSleuth2ById(Integer id, List<AllPair> allList) {
         List<PairSleuth> pairSleuths = new ArrayList<>();
-        AllPair allPair = allPairRepository.getById(id);
+//        AllPair allPair = allPairRepository.getById(id);
+        AllPair allPair = allList.stream().filter(p -> p.getId().equals(id)).collect(Collectors.toList()).get(0);
         String address = allPair.getPath1();
         QueryWrapper<AllPair> wrapperPair = new QueryWrapper<>();
         if (USDT.equals(allPair.getPath1())) {
             address = allPair.getPath0();
         }
-        wrapperPair.eq("path1", address);
-        List<AllPair> pairsLeft = allPairRepository.list(wrapperPair);
-        List<AllPair> allPairs = allPairRepository.list();
+//        wrapperPair.eq("path1", address);
+//        List<AllPair> pairsLeft = allPairRepository.list(wrapperPair);
+        String finalAddress = address;
+        List<AllPair> pairsLeft = allList.stream().filter(p -> p.getPath1().equals(finalAddress)).collect(Collectors.toList());
         for (AllPair pair : pairsLeft) {
             String iPath0 = pair.getPath0();
-            searchSleuth(id, pairSleuths, address, wrapperPair, iPath0, allPairs);
+            searchSleuth(id, pairSleuths, address, wrapperPair, iPath0, allList);
         }
-        wrapperPair.clear();
-        wrapperPair.eq("path0", address);
-        List<AllPair> pairsRight = allPairRepository.list(wrapperPair);
+//        wrapperPair.clear();
+//        wrapperPair.eq("path0", address);
+//        List<AllPair> pairsRight = allPairRepository.list(wrapperPair);
+        List<AllPair> pairsRight = allList.stream().filter(p -> p.getPath0().equals(finalAddress)).collect(Collectors.toList());
         for (AllPair pair : pairsRight) {
             String iPath1 = pair.getPath1();
-            searchSleuth(id, pairSleuths, address, wrapperPair, iPath1, allPairs);
+            searchSleuth(id, pairSleuths, address, wrapperPair, iPath1, allList);
         }
         log.info("id:{}链路扫描完毕, 新增链路数:{}", id, pairSleuths.size());
         pairSleuthRepository.saveBatch(pairSleuths);
@@ -190,8 +194,8 @@ public class PairServiceImpl implements PairService {
     }
 
     private void searchSleuth(Integer id, List<PairSleuth> pairSleuths, String address, QueryWrapper<AllPair> wrapperPair, String iPath1, List<AllPair> allPairs) {
-        wrapperPair.clear();
-        wrapperPair.eq("path0", iPath1).or().eq("path1", iPath1);
+//        wrapperPair.clear();
+//        wrapperPair.eq("path0", iPath1).or().eq("path1", iPath1);
         List<AllPair> collectList = allPairs.stream().filter(p -> p.getPath0().equals(iPath1) || p.getPath1().equals(iPath1)).collect(Collectors.toList());
 //        List<AllPair> iPairsAll = allPairRepository.list(wrapperPair);
         for (AllPair pairAll : collectList) {
